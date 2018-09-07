@@ -7,8 +7,8 @@ from sensegame import Joystick
 # Constants
 color_food = [0, 255, 0]
 color_snake_head = [255, 255, 0]
-color_snake_body1 = [180, 130, 0]
-color_snake_body2 = [190, 30, 0]
+color_snake_body1 = [180, 130, 80]
+color_snake_body2 = [190, 30, 80]
 color_barrier = [255, 0, 0]
 color_background = [0, 0, 0]
 loop_time_seconds = 0.2
@@ -31,7 +31,10 @@ class Game(object):
         self.joystick = Joystick()
         self.joystick.register_key_press_callback(self.on_key_pressed)
 
+        self.score = 0
+
     def play(self):
+        self.place_food()
         self.place_food()
 
         while True:
@@ -39,7 +42,10 @@ class Game(object):
             time.sleep(loop_time_seconds)
 
             self.move_snake()
-            self.handle_collision()
+            if self.handle_collision():
+                break
+
+        self.sense.show_message(str(self.score), text_colour=[0, 255, 0])
 
     def on_key_pressed(self, key):
         if key in ["UP", "DOWN", "LEFT", "RIGHT"]:
@@ -51,8 +57,7 @@ class Game(object):
 
         # Check for barriers or self-intersection
         if head_cell in body_cells or head_cell in self.barrier_cells:
-            print("Game over!")
-            exit(0)
+            return True
 
         if head_cell in self.food_cells:
             # #at the current food cell.
@@ -65,6 +70,8 @@ class Game(object):
 
             # Place more food since we just ate it
             self.place_food()
+
+            self.score += 1
 
     def cell_to_index(self, cell):
         x, y = cell
@@ -123,4 +130,5 @@ class Game(object):
         c = random.choice(list(c for c in self._iter_cells() if self.is_cell_free(c)))
         self.food_cells.append(c)
 
-Game().play()
+while True:
+    Game().play()
