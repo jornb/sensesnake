@@ -7,10 +7,14 @@ from sensegame import Joystick
 # Constants
 color_food = [0, 255, 0]
 color_snake_head = [255, 255, 0]
-color_snake_body = [180, 130, 0]
+color_snake_body1 = [180, 130, 0]
+color_snake_body2 = [190, 30, 0]
 color_barrier = [255, 0, 0]
 color_background = [0, 0, 0]
-loop_time_seconds = 0.25
+loop_time_seconds = 0.2
+
+def interpolate_color(A, B, t):
+    return [int(a*(1.0 - t) + b*t) for a, b in zip(A, B)]
 
 class Game(object):
     def __init__(self):
@@ -76,7 +80,8 @@ class Game(object):
             if cell == self.snake_cells[-1]:
                 return color_snake_head
             else:
-                return color_snake_body
+                i = self.snake_cells.index(cell)
+                return interpolate_color(color_snake_body1, color_snake_body2, i / len(self.snake_cells))
         elif cell in self.barrier_cells:
             return color_barrier
         else:
